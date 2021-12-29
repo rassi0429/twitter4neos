@@ -12,13 +12,14 @@ if (!token) new Error("twitter bearer token not provided")
 app.get("/tweets/search",async (req, res) => {
     if(!req.query.q) {
         res.status(400).send("BAD_REQUEST")
+        return
     }
     try {
-        const {data} = await axios.get(api_url + encodeURI(req.query.q), {headers:{Authorization: `Bearer ${token}`}})
+        const {data} = await axios.get(api_url + encodeURIComponent(req.query.q), {headers:{Authorization: `Bearer ${token}`}})
         res.send(req.query.emap ? j2e(data.data) : data.data)
         return
     } catch(e) {
-        console.error(e)
+        // console.error(e)
         res.status(500).send("INTERNAL_SERVER_ERROR")
     }
 })
