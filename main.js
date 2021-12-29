@@ -18,6 +18,7 @@ app.get("/tweets/search",async (req, res) => {
         res.send(req.query.emap ? j2e(data.data) : data.data)
         return
     } catch(e) {
+        console.error(e)
         res.status(500).send("INTERNAL_SERVER_ERROR")
     }
 })
