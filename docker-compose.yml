@@ -4,5 +4,7 @@ services:
     build: .
     init: true
     restart: on-failure:3
+    environment:
+      - TWITTER_TOKEN=YOUR_TOKEN_IS_HERE
     ports:
       - "127.0.0.1:3000:3000"
