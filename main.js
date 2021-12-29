@@ -14,7 +14,7 @@ app.get("/tweets/search",async (req, res) => {
         res.status(400).send("BAD_REQUEST")
     }
     try {
-        const {data} = await axios.get(api_url + req.query.q, {headers:{Authorization: `Bearer ${token}`}})
+        const {data} = await axios.get(api_url + encodeURI(req.query.q), {headers:{Authorization: `Bearer ${token}`}})
         res.send(req.query.emap ? j2e(data.data) : data.data)
         return
     } catch(e) {
