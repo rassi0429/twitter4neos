@@ -14,7 +14,7 @@ var CacheDate = 0
 var CacheLife = 5*60*1000
 
 async function search(query, count=15){
-    let url = `${api_url}?query=${query}&count=${count}`;
+    let url = `${api_url}?query=${query}&max_results=${count}`;
     let {data} = await axios.get(url, {headers:{Authorization: `Bearer ${token}`}})
     return data
 }
