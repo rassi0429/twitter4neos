@@ -1,6 +1,6 @@
 const axios = require("axios")
 const express = require("express")
-const api_url = "https://api.twitter.com/2/tweets/search/recent?query="
+const api_url = "https://api.twitter.com/2/tweets/search/recent"
 const j2e = require("json2emap")
 
 const app = express()
@@ -13,7 +13,11 @@ var CachedData = {}
 var CacheDate = 0
 var CacheLife = 5*60*1000
 
-
+async function search(query, count=15){
+    let url = `${api_url}?query=${query}&count=${count}`;
+    let {data} = await axios.get(url, {headers:{Authorization: `Bearer ${token}`}})
+    return data
+}
 
 app.get("/tweets/search",async (req, res) => {
     if(!req.query.q) {
@@ -27,7 +31,7 @@ app.get("/tweets/search",async (req, res) => {
         if(req.query.cache && (nowDate - CacheDate) < CacheLife)
             data = CachedData
         else{
-            data = (await axios.get(api_url + encodeURIComponent(req.query.q), {headers:{Authorization: `Bearer ${token}`}})).data
+            data = await search(req.query.q, req.query.count)
             CachedData = data
             CacheDate = nowDate
         }
