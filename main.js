@@ -27,7 +27,7 @@ app.get("/tweets/search",async (req, res) => {
         if(req.query.cache && (nowDate - CacheDate) > CacheLife)
             data = CachedData
         else
-            data = await axios.get(api_url + encodeURIComponent(req.query.q), {headers:{Authorization: `Bearer ${token}`}}).data
+            data = (await axios.get(api_url + encodeURIComponent(req.query.q), {headers:{Authorization: `Bearer ${token}`}})).data
         
         CachedData = data
         CacheDate = nowDate
@@ -35,7 +35,7 @@ app.get("/tweets/search",async (req, res) => {
         res.send(req.query.emap ? j2e(data.data) : data.data)
         return
     } catch(e) {
-        // console.error(e)
+        console.error(e)
         res.status(500).send("INTERNAL_SERVER_ERROR")
     }
 })
