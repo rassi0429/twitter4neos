@@ -9,13 +9,29 @@ const app = express()
 const token = process.env.TWITTER_TOKEN
 if (!token) new Error("twitter bearer token not provided")
 
+var CachedData = {}
+var CacheDate = 0
+var CacheLife = 5*60*1000
+
+
+
 app.get("/tweets/search",async (req, res) => {
     if(!req.query.q) {
         res.status(400).send("BAD_REQUEST")
         return
     }
     try {
-        const {data} = await axios.get(api_url + encodeURIComponent(req.query.q), {headers:{Authorization: `Bearer ${token}`}})
+        let data
+        let nowDate = new Date()
+
+        if(req.query.cache && (nowDate - CacheDate) > CacheLife)
+            data = CachedData
+        else
+            data = await axios.get(api_url + encodeURIComponent(req.query.q), {headers:{Authorization: `Bearer ${token}`}}).data
+        
+        CachedData = data
+        CacheDate = nowDate
+
         res.send(req.query.emap ? j2e(data.data) : data.data)
         return
     } catch(e) {
