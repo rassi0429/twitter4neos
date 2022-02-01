@@ -24,13 +24,13 @@ app.get("/tweets/search",async (req, res) => {
         let data
         let nowDate = new Date()
 
-        if(req.query.cache && (nowDate - CacheDate) > CacheLife)
+        if(req.query.cache && (nowDate - CacheDate) < CacheLife)
             data = CachedData
-        else
+        else{
             data = await axios.get(api_url + encodeURIComponent(req.query.q), {headers:{Authorization: `Bearer ${token}`}}).data
-        
-        CachedData = data
-        CacheDate = nowDate
+            CachedData = data
+            CacheDate = nowDate
+        }
 
         res.send(req.query.emap ? j2e(data.data) : data.data)
         return
