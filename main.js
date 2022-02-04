@@ -10,9 +10,26 @@ const app = express()
 const token = process.env.TWITTER_TOKEN
 if (!token) throw Error("twitter bearer token not provided")
 
+const CacheLife = 5*60*1000
+const CacheReflesInterval = CacheLife*2
+
 var CachedData = {}
-var CacheDate = 0
-var CacheLife = 5*60*1000
+
+function CacheReflesh(){
+    try{
+        let nowDate = new Date()
+        if(Object.keys(CachedData).length == 0)
+        return
+        for(let key in CachedData){
+            if((nowDate - CachedData[key].date) > CacheLife)
+            delete(CachedData[key])
+        }
+    } catch(e) {
+        console.error(e)
+    }
+}
+
+setInterval(CacheReflesh, CacheReflesInterval);
 
 async function Search(query, count=10){
     let url = `${api_url}tweets/search/recent?query=${encodeURIComponent(query)}&max_results=${count}&expansions=author_id,referenced_tweets.id&tweet.fields=created_at`
@@ -105,12 +122,14 @@ app.get("/tweets/search",async (req, res) => {
         let data
         let nowDate = new Date()
 
-        if(req.query.cache && (nowDate - CacheDate) < CacheLife)
-            data = CachedData
+        if(CachedData[req.query.q]!=undefined && (nowDate - CachedData[req.query.q].date) < CacheLife)
+            data = CachedData[req.query.q].data
         else{
             data = await Search(req.query.q, req.query.count)
-            CachedData = data
-            CacheDate = nowDate
+            CachedData[req.query.q] = {
+                data: data,
+                date: nowDate
+            }
         }
         res.send(req.query.emap ? j2e(data) : data)
         return
