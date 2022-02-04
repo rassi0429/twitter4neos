@@ -8,7 +8,7 @@ const app = express()
 
 
 const token = process.env.TWITTER_TOKEN
-if (!token) new Error("twitter bearer token not provided")
+if (!token) throw Error("twitter bearer token not provided")
 
 var CachedData = {}
 var CacheDate = 0
